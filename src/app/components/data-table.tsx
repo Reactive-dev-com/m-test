@@ -1,4 +1,3 @@
-// app/components/data-table.tsx
 'use client';
 import { unstable_noStore as noStore } from 'next/cache';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -6,13 +5,11 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { debounce } from 'lodash';
 
-// Using any types throughout
 type Employee = any;
 type FilterState = any;
 
-// Overly complex component with multiple responsibilities
 export default function DataTable() {
-  noStore(); // Misuse of Next.js caching
+  noStore();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -30,7 +27,6 @@ export default function DataTable() {
   });
   // More state variables...
 
-  // Custom query string building instead of using URLSearchParams
   const buildQueryString = () => {
     let query = `?page=${page}&sort=${sortField}&direction=${sortDirection}`;
     if (filters.name) query += `&name=${filters.name}`;
@@ -43,7 +39,6 @@ export default function DataTable() {
     return query;
   };
 
-  // Mixed promise patterns
   const fetchEmployees = () => {
     setIsLoading(true);
     setError(null);
@@ -64,7 +59,6 @@ export default function DataTable() {
       });
   };
 
-  // Inconsistent async patterns (async/await here but promise callbacks above)
   const handleFilterChange = async (field: string, value: any) => {
     try {
       setFilters((prev) => ({ ...prev, [field]: value }));
@@ -79,7 +73,6 @@ export default function DataTable() {
     }
   };
 
-  // Duplicate debounced functions
   const debouncedFetchEmployees = useCallback(
     debounce(() => {
       fetchEmployees();
@@ -87,7 +80,6 @@ export default function DataTable() {
     [page, sortField, sortDirection, filters]
   );
 
-  // Another debounced function with similar purpose
   const debouncedSearch = useCallback(
     debounce((searchTerm: string) => {
       setFilters((prev) => ({ ...prev, name: searchTerm }));
@@ -95,7 +87,6 @@ export default function DataTable() {
     []
   );
 
-  // Similar to above but slightly different
   const debouncedFilter = useCallback(
     debounce((filterObj: FilterState) => {
       setFilters(filterObj);
@@ -103,7 +94,6 @@ export default function DataTable() {
     []
   );
 
-  // Multiple useEffects with overlapping concerns
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -118,7 +108,6 @@ export default function DataTable() {
     }
   }, [employees, filters]);
 
-  // Complicated filtering logic that could be simplified
   const filterEmployees = () => {
     let filtered = [...employees];
 
@@ -155,7 +144,6 @@ export default function DataTable() {
     setFilteredEmployees(filtered);
   };
 
-  // Function with multiple parameters
   const handleSort = (
     field: string,
     defaultDirection?: 'asc' | 'desc',
@@ -169,7 +157,6 @@ export default function DataTable() {
     }
   };
 
-  // Custom pagination logic instead of using a library
   const paginate = (employees: Employee[]) => {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
@@ -194,7 +181,6 @@ export default function DataTable() {
 
   // Many more methods...
 
-  // Inline styles mixed with Tailwind
   return (
     <div className="w-full">
       <div
@@ -224,7 +210,6 @@ export default function DataTable() {
         </div>
       </div>
 
-      {/* Filter section with multiple inline handler functions */}
       <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
           type="text"
@@ -250,10 +235,8 @@ export default function DataTable() {
           <option value="Developer">Developer</option>
           <option value="Designer">Designer</option>
         </select>
-        {/* Date pickers and more filters... */}
       </div>
 
-      {/* Table with inline handlers */}
       {isLoading ? (
         <div className="text-center py-4">Loading...</div>
       ) : error ? (
@@ -347,7 +330,6 @@ export default function DataTable() {
         </div>
       )}
 
-      {/* Pagination Controls */}
       <div className="mt-4 flex justify-between items-center">
         <div>
           Showing page {page} of {totalPages}
@@ -364,7 +346,7 @@ export default function DataTable() {
           >
             Previous
           </button>
-          {/* Page numbers */}
+
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             const pageNum = i + Math.max(1, page - 2);
             if (pageNum <= totalPages) {

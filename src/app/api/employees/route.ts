@@ -1,4 +1,3 @@
-// app/api/employees/route.ts
 import { unstable_noStore as noStore } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -31,15 +30,12 @@ let employees = [
   // More employees...
 ];
 
-// Misuse of experimental features
-// The cache issue mentioned in the report
-export async function GET(request: NextRequest) {
-  noStore(); // Prevents caching unnecessarily in an API route
+export async function GET(request: any) {
+  noStore();
 
   try {
     const { searchParams } = request?.nextUrl;
 
-    // Using searchParams incorrectly
     const page = searchParams.get('page') || '1';
     const sort = searchParams.get('sort') || 'name';
     const direction = searchParams.get('direction') || 'asc';
@@ -84,7 +80,6 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Sort employees
     employees.sort((a, b) => {
       const aValue = a[sort as keyof typeof a];
       const bValue = b[sort as keyof typeof b];
@@ -102,7 +97,6 @@ export async function GET(request: NextRequest) {
       return 0;
     });
 
-    // Pagination
     const pageNumber = parseInt(page, 10);
     const pageSize = 10;
     const startIndex = (pageNumber - 1) * pageSize;
@@ -124,17 +118,16 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST handler with inconsistent error handling
 export async function POST(request: NextRequest) {
-  noStore(); // Unnecessary for POST
+  noStore();
 
   try {
     const data = await request.json();
 
-    employees.push(data);
-
     // Here you would typically save the data to a database
-    // For now, we'll just return the received data
+    // For now, we'll push into an in memory array and return the received data
+
+    employees.push(data);
 
     return NextResponse.json({
       success: true,

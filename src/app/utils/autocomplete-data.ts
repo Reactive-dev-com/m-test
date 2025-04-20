@@ -1,16 +1,11 @@
-// app/utils/autocomplete-data.ts
-// All API functions in a single file instead of co-located with their routes
 import axios from 'axios';
 import { format } from 'date-fns';
 
-// Lots of any types
 export type Employee = any;
 export type Department = any;
 export type Position = any;
 export type Salary = any;
 
-// Inconsistent error handling patterns
-// This function uses try/catch
 export const fetchEmployees = async (
   page: number = 1,
   sort: string = 'name',
@@ -18,21 +13,23 @@ export const fetchEmployees = async (
   filters: any = {}
 ) => {
   try {
-    // Custom query string building instead of URLSearchParams
     let query = `?page=${page}&sort=${sort}&direction=${direction}`;
-    
+
     if (filters.name) query += `&name=${filters.name}`;
     if (filters.department) query += `&department=${filters.department}`;
     if (filters.position) query += `&position=${filters.position}`;
-    
+
     if (filters.startDate) {
-      query += `&startDate=${format(new Date(filters.startDate), 'yyyy-MM-dd')}`;
+      query += `&startDate=${format(
+        new Date(filters.startDate),
+        'yyyy-MM-dd'
+      )}`;
     }
-    
+
     if (filters.endDate) {
       query += `&endDate=${format(new Date(filters.endDate), 'yyyy-MM-dd')}`;
     }
-    
+
     const response = await axios.get(`/api/employees${query}`);
     return response.data;
   } catch (error) {
@@ -41,35 +38,36 @@ export const fetchEmployees = async (
   }
 };
 
-// This function returns promise directly without try/catch
 export const fetchDepartments = () => {
-  return axios.get('/api/departments')
-    .then(response => response.data)
-    .catch(error => {
+  return axios
+    .get('/api/departments')
+    .then((response) => response.data)
+    .catch((error) => {
       console.log('Error fetching departments:', error);
       return [];
     });
 };
 
-// This function uses callback pattern
-export const fetchPositions = (department: string, callback: (positions: Position[]) => void) => {
-  axios.get(`/api/positions?department=${department}`)
-    .then(response => {
+export const fetchPositions = (
+  department: string,
+  callback: (positions: Position[]) => void
+) => {
+  axios
+    .get(`/api/positions?department=${department}`)
+    .then((response) => {
       callback(response.data);
     })
-    .catch(error => {
+    .catch((error) => {
       console.log('Error fetching positions:', error);
       callback([]);
     });
 };
 
-// This function uses async/await with inconsistent error handling
 export const createEmployee = async (employee: Employee) => {
   try {
     const response = await axios.post('/api/employees', employee);
     return response.data;
   } catch (error: any) {
-    // Inconsistent error handling
     if (error.response) {
       console.log('Server error:', error.response.data);
       return { error: error.response.data };
@@ -80,7 +78,6 @@ export const createEmployee = async (employee: Employee) => {
   }
 };
 
-// This function uses a different approach to error handling
 export const updateEmployee = async (id: string, data: any) => {
   try {
     const response = await axios.put(`/api/employees/${id}`, data);
@@ -90,13 +87,11 @@ export const updateEmployee = async (id: string, data: any) => {
   }
 };
 
-// This function doesn't handle errors at all
 export const deleteEmployee = async (id: string) => {
   const response = await axios.delete(`/api/employees/${id}`);
   return response.data;
 };
 
-// Inconsistent date handling
 export const formatDate = (date: any) => {
   if (!date) return '';
   try {
@@ -107,7 +102,6 @@ export const formatDate = (date: any) => {
   }
 };
 
-// Duplicate functionality with slightly different implementations
 export const formatDateForDisplay = (date: any) => {
   if (!date) return 'N/A';
   try {
@@ -118,29 +112,30 @@ export const formatDateForDisplay = (date: any) => {
   }
 };
 
-// More inconsistent error handling
 export const fetchSalaryHistory = (employeeId: string) => {
   return new Promise((resolve, reject) => {
-    axios.get(`/api/salary-history/${employeeId}`)
-      .then(response => {
+    axios
+      .get(`/api/salary-history/${employeeId}`)
+      .then((response) => {
         resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('Error fetching salary history:', error);
         reject(error);
       });
   });
 };
 
-// Unnecessary wrapper for simple API call
 export const fetchEmployeeById = async (id: string) => {
-  return axios.get(`/api/employees/${id}`).then(res => res.data);
+  return axios.get(`/api/employees/${id}`).then((res) => res.data);
 };
 
 // More duplicated functionality
 export const searchEmployees = async (searchTerm: string) => {
   try {
-    const response = await axios.get(`/api/employees/search?term=${searchTerm}`);
+    const response = await axios.get(
+      `/api/employees/search?term=${searchTerm}`
+    );
     return response.data;
   } catch (error) {
     console.log('Search error:', error);
@@ -148,7 +143,6 @@ export const searchEmployees = async (searchTerm: string) => {
   }
 };
 
-// Function with too many parameters
 export const generatePayrollReport = async (
   startDate: Date,
   endDate: Date,
@@ -168,7 +162,7 @@ export const generatePayrollReport = async (
       includeOvertime,
       includePTO,
       format,
-      email
+      email,
     });
     return response.data;
   } catch (error) {
@@ -177,16 +171,17 @@ export const generatePayrollReport = async (
   }
 };
 
-// Many more functions with similar issues...
-// ...
+// Many more functions...
 
-// export a bunch of utility functions that should be in separate files
-export const calculateNetSalary = (gross: number, tax: number, deductions: number) => {
-  return gross - (gross * tax / 100) - deductions;
+export const calculateNetSalary = (
+  gross: number,
+  tax: number,
+  deductions: number
+) => {
+  return gross - (gross * tax) / 100 - deductions;
 };
 
 export const calculateTax = (salary: number, taxBracket: string) => {
-  // Simple tax calculation logic
   switch (taxBracket) {
     case 'A':
       return salary * 0.1;
@@ -198,5 +193,3 @@ export const calculateTax = (salary: number, taxBracket: string) => {
       return salary * 0.15;
   }
 };
-
-// And many more utility functions...

@@ -1,10 +1,8 @@
-// app/components/reusable-form.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 
-// Overuse of any and optional types
 type FormField = {
   name: string;
   label: string;
@@ -25,7 +23,6 @@ type FormProps = {
   initialData?: any;
 };
 
-// Overly complex form component
 export default function ReusableForm({
   fields,
   onSubmit,
@@ -34,7 +31,6 @@ export default function ReusableForm({
   onCancel,
   initialData = {},
 }: FormProps) {
-  // State for form values, errors, etc.
   const [formValues, setFormValues] = useState<any>({});
   const [formErrors, setFormErrors] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -43,7 +39,6 @@ export default function ReusableForm({
   const [departments, setDepartments] = useState<any[]>([]);
   const [positions, setPositions] = useState<any[]>([]);
 
-  // Initialize form with initial data
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
       const initialValues: any = {};
@@ -51,7 +46,6 @@ export default function ReusableForm({
         if (initialData[field.name] !== undefined) {
           initialValues[field.name] = initialData[field.name];
         } else {
-          // Default values based on field type
           switch (field.type) {
             case 'text':
             case 'email':
@@ -82,7 +76,6 @@ export default function ReusableForm({
     }
   }, [initialData, fields]);
 
-  // Fetch departments using axios directly in component
   useEffect(() => {
     axios
       .get('/api/departments')
@@ -94,7 +87,6 @@ export default function ReusableForm({
       });
   }, []);
 
-  // Another useEffect for a related concern
   useEffect(() => {
     if (formValues.department) {
       axios
@@ -108,12 +100,10 @@ export default function ReusableForm({
     }
   }, [formValues.department]);
 
-  // Validate entire form on every change
   useEffect(() => {
     validateForm();
   }, [formValues, touchedFields]);
 
-  // Complex handler for different input types
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -122,7 +112,6 @@ export default function ReusableForm({
     const { name, value, type } = e.target as HTMLInputElement;
     let newValue: any = value;
 
-    // Process different input types
     if (type === 'checkbox') {
       newValue = (e.target as HTMLInputElement).checked;
     } else if (type === 'number') {
@@ -146,13 +135,11 @@ export default function ReusableForm({
     }
   };
 
-  // Custom validation function instead of using a library
   const validateForm = () => {
     let newErrors: any = {};
     let formIsValid = true;
 
     fields.forEach((field) => {
-      // Skip validation for untouched fields
       if (!touchedFields.includes(field.name)) {
         return;
       }
@@ -160,7 +147,6 @@ export default function ReusableForm({
       const value = formValues[field.name];
       let fieldError = '';
 
-      // Required field validation
       if (
         field.required &&
         (value === undefined || value === null || value === '')
@@ -169,7 +155,6 @@ export default function ReusableForm({
         formIsValid = false;
       }
 
-      // Custom validation rules
       if (!fieldError && field.validation) {
         switch (field.validation.type) {
           case 'email':
@@ -237,15 +222,12 @@ export default function ReusableForm({
     setIsValid(formIsValid);
   };
 
-  // Handle form submission with mixed async patterns
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Force validation of all fields
     const allFields = fields.map((field) => field.name);
     setTouchedFields(allFields);
 
-    // Validate form one more time
     let submitErrors: any = {};
     let formIsValid = true;
 
@@ -253,7 +235,6 @@ export default function ReusableForm({
       const value = formValues[field.name];
       let fieldError = '';
 
-      // Required field validation
       if (
         field.required &&
         (value === undefined || value === null || value === '')
@@ -261,9 +242,6 @@ export default function ReusableForm({
         fieldError = `${field.label} is required`;
         formIsValid = false;
       }
-
-      // More validation logic duplicated from validateForm
-      // ...
 
       if (fieldError) {
         submitErrors[field.name] = fieldError;
@@ -278,9 +256,7 @@ export default function ReusableForm({
 
     setIsSubmitting(true);
 
-    // Using promise callbacks
     if (onSubmit) {
-      // Format dates before submission
       const formattedValues = { ...formValues };
       fields.forEach((field) => {
         if (field.type === 'date' && formValues[field.name]) {
@@ -308,10 +284,8 @@ export default function ReusableForm({
     }
   };
 
-  // Handle cancel with another pattern
   const handleCancel = async () => {
     try {
-      // Some async operations before cancel
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       if (onCancel) {
@@ -322,13 +296,11 @@ export default function ReusableForm({
     }
   };
 
-  // Complex render method with conditional rendering
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {fields.map((field) => {
         const error = formErrors[field.name];
 
-        // Render different input types
         let inputElement;
         switch (field.type) {
           case 'text':
@@ -364,7 +336,6 @@ export default function ReusableForm({
             );
             break;
           case 'select':
-            // Special case for position field that depends on department
             let options = field.options || [];
             if (field.name === 'position') {
               options = positions;
