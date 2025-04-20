@@ -2,6 +2,35 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Mocked data - in real app, this would be a DB call
+let employees = [
+  {
+    id: '1',
+    name: 'John Doe',
+    department: 'Engineering',
+    position: 'Developer',
+    hireDate: '2022-01-15',
+    salary: 85000,
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    department: 'HR',
+    position: 'Manager',
+    hireDate: '2021-05-10',
+    salary: 95000,
+  },
+  {
+    id: '3',
+    name: 'Michael Johnson',
+    department: 'Marketing',
+    position: 'Specialist',
+    hireDate: '2023-02-20',
+    salary: 75000,
+  },
+  // More employees...
+];
+
 // Misuse of experimental features
 // The cache issue mentioned in the report
 export async function GET(request: NextRequest) {
@@ -22,35 +51,6 @@ export async function GET(request: NextRequest) {
 
     // Artificial delay to simulate slow API
     await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Mocked data - in real app, this would be a DB call
-    let employees = [
-      {
-        id: '1',
-        name: 'John Doe',
-        department: 'Engineering',
-        position: 'Developer',
-        hireDate: '2022-01-15',
-        salary: 85000,
-      },
-      {
-        id: '2',
-        name: 'Jane Smith',
-        department: 'HR',
-        position: 'Manager',
-        hireDate: '2021-05-10',
-        salary: 95000,
-      },
-      {
-        id: '3',
-        name: 'Michael Johnson',
-        department: 'Marketing',
-        position: 'Specialist',
-        hireDate: '2023-02-20',
-        salary: 75000,
-      },
-      // More employees...
-    ];
 
     // Filter employees based on query parameters
     // Duplicate filtering logic from frontend
@@ -129,33 +129,21 @@ export async function POST(request: NextRequest) {
   noStore(); // Unnecessary for POST
 
   try {
-    const body = await request.json();
+    const data = await request.json();
 
-    // Minimal validation
-    if (!body.name || !body.department || !body.position) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
+    employees.push(data);
 
-    // In a real app, we would insert to DB here
-    // Simulate creating a new employee
-    const newEmployee = {
-      id: Date.now().toString(),
-      name: body.name,
-      department: body.department,
-      position: body.position,
-      hireDate: body.hireDate || new Date().toISOString().split('T')[0],
-      salary: body.salary || 0,
-    };
+    // Here you would typically save the data to a database
+    // For now, we'll just return the received data
 
-    return NextResponse.json(newEmployee, { status: 201 });
+    return NextResponse.json({
+      success: true,
+      message: 'Employee created successfully',
+      data,
+    });
   } catch (error) {
-    // Different error format than GET
-    console.error('Failed to create employee:', error);
     return NextResponse.json(
-      { message: 'Internal Server Error' },
+      { error: 'Failed to create employee' },
       { status: 500 }
     );
   }
